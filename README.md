@@ -3,7 +3,7 @@
 Object Validator help you to build validating function to validate a JSON Object easily. based on [node-validator](https://github.com/chriso/node-validator)
 
 <!--- travis ci -->
-[![Build Status](https://travis-ci.org/villadora/node-obj-validator?branch=master)](https://travis-ci.org/villadora/node-obj-validator)
+[![Build Status](https://travis-ci.org/villadora/node-obj-validator.png?branch=master)](https://travis-ci.org/villadora/node-obj-validator)
 
 ## Installation
 
