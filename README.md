@@ -19,7 +19,7 @@ Install with npm:
 
     validate = Checker({
         'id': Checker.isInt(),
-        'username': Checker
+        'username': Checker.isUppercase()
     });
 
     validate = Checker({
