@@ -1,6 +1,6 @@
 var assert = require('chai').assert,
-    check = require('validator').check,
-    Checker = require('./index').Checker;
+check = require('validator').check,
+Checker = require('./index').Checker;
 
 describe('obj-validator', function() {
     it('simple check', function() {

@@ -3,7 +3,7 @@
 Object Validator help you to build validating function to validate a JSON Object easily. based on [node-validator](https://github.com/chriso/node-validator)
 
 <!--- travis ci -->
-[![Build Status](https://travis-ci.org/villadora/obj-validator?branch=master)](https://travis-ci.org/villadora/obj-validator)
+[![Build Status](https://travis-ci.org/villadora/node-obj-validator?branch=master)](https://travis-ci.org/villadora/node-obj-validator)
 
 ## Installation
 
@@ -14,25 +14,26 @@ Install with npm:
 
 ## Example
 
-    var Checker = require('obj-validator');
+    var Checker = require('obj-validator').Checker,
+        validate;
 
-    Checker({
+    validate = Checker({
         'id': Checker.isInt(),
         'username': Checker
     });
 
-    Checker({
+    validate = Checker({
         'id': Checker.msg('Id is not int').isInt()
     });
 
-    Checker({
+    validate = Checker({
         'foo': Checker.msg({
             isNumeric: 'This is not a number',
             contains: "The value doesn't have a 0 in it"
         }).isNumeric().contains('0')
     });
 
-    Checker({
+    validate = Checker({
         'id': Checker.msg('Id is not int').isInt(),
         'profile': {
             'name': Checker.isAlpha(),
@@ -40,6 +41,11 @@ Install with npm:
         }
     });
 
+    try {
+        validate(candidate)
+    }catch(e) {
+        console.log(e.message);
+    }
 
 ## Validation methods
 
