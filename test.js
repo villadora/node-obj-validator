@@ -67,7 +67,6 @@ describe('obj-validator', function() {
         var foo = Checker({
             'foo': Checker.msg({
                 isNumeric: 'This is not a number',
-                gst
                 contains: "The value doesn't have a 0 in it"
             }).isNumeric().contains('0')
         });
