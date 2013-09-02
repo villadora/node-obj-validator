@@ -50,9 +50,23 @@ Checker.msg = function(msg) {
 // ===================
 
 function Rule(msg) {
-    this.msg = msg;
-    this.checks = [];
+    function rule(obj) {
+        var checks = rule.checks,
+            v = check(obj, rule.msg);
+
+        for (var i = 0, len = checks.length; i < len; ++i) {
+            v[checks[i][0]].apply(v, checks[i][1]);
+        }
+    }
+
+    rule.__proto__ = Rule.prototype;
+
+    rule.msg = msg;
+    rule.checks = [];
+
+    return rule;
 }
+
 
 for (var key in validators) {
     if (validators.hasOwnProperty(key)) {
@@ -64,6 +78,7 @@ for (var key in validators) {
                     if (this === Checker) {
                         host = new Rule();
                     }
+
                     host.checks.push([key, arguments]);
                     return host;
             };
@@ -80,12 +95,7 @@ module.exports.Checker = Checker;
 
 function applyRule(rule, val) {
     if (rule instanceof Rule) {
-        var checks = rule.checks,
-            v = check(val, rule.msg);
-
-        for (var i = 0, len = checks.length; i < len; ++i) {
-            v[checks[i][0]].apply(v, checks[i][1]);
-        }
+        rule(val);
     } else if (isPlainObject(rule)) {
         for (var field in rule) {
             if (rule.hasOwnProperty(field)) {
@@ -95,7 +105,6 @@ function applyRule(rule, val) {
             }
         }
     }
-
 }
 
 
