@@ -3,6 +3,10 @@ var assert = require('chai').assert,
     Checker = require('./index').Checker;
 
 describe('obj-validator', function() {
+    it('api check', function() {
+        assert(require('./index').check);
+        assert(require('./index').sanitize);
+    });
 
     it('simple check', function() {
         var user = Checker({

@@ -89,6 +89,7 @@ for (var key in validators) {
 
 module.exports.Checker = Checker;
 module.exports.check = check;
+module.exports.sanitize = validator.sanitize;
 
 // ===================
 // Helpers
