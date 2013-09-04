@@ -1,6 +1,6 @@
 {
     "name": "obj-validator",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "description": "validate JSON object with node-validator",
     "main": "index.js",
     "scripts": {
