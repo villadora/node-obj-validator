@@ -59,7 +59,9 @@ Install with npm:
         'id': Checker.isInt().error(function(msg) { console.log(msg); }), // the same as validator
         'profile': Checker({
             ...
-        }).onerror(function(/* message */ msg, /* property name */ key, /* original error */original) { throw new Error('Invalid profile'); })
+        }).onerror(function(/* message */ msg, /* property name */ key, /* original error */original) {
+            throw new Error('Invalid profile'); 
+        })
     }).onerror(function(msg, key, err) {...});
 
     
