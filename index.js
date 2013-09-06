@@ -1,7 +1,7 @@
 var validator = require('validator'),
-    check = validator.check,
-    validators = validator.validators,
-    Validator = validator.Validator;
+check = validator.check,
+validators = validator.validators,
+Validator = validator.Validator;
 
 // ===================
 // Validator Extend
@@ -32,40 +32,105 @@ var Checker = function(rules) {
     var rules = rules || {};
     validateRule(rules);
 
-    return function(obj) {
-        for (var key in rules) {
-            if (rules.hasOwnProperty(key)) {
-                applyRule(rules[key], obj[key]);
+    function checker(obj) {
+        if(checker.optional && typeof obj === 'undefined')
+            return;
+
+        /* jshint eqnull: true */
+        if(obj == null) {
+            if(checker.onerror)
+                checker.onerror(checker.__msg || 'Candidate is undefined or null');
+            else
+                throw new Error(checker.__msg || 'Candidate is undefined or null');
+        }
+
+        for (var key in checker.rules) {
+            try { 
+                if (checker.rules.hasOwnProperty(key)) {
+                    applyRule(checker.rules[key], obj[key]);
+                }
+            }catch(e) {
+                if(checker.onerror) checker.onerror(e.message, key, e);
+                else {
+                    e.key = key;
+                    throw e;
+                }
             }
         }
+    }
+
+    checker.rules = rules;
+
+    checker.msg = function(msg) {
+        this.__msg = msg;
+        return this;
     };
+
+    checker.isOptional = function() {
+        this.optional = true;
+        return this;
+    };
+
+    checker.error = function(onerror) {
+        this.onerror = onerror;
+        return this;
+    };
+
+    return checker;
 };
+
 
 Checker.msg = function(msg) {
     return new Rule(msg);
+};
+
+Checker.isOptional = function() {
+    return new Rule(undefined, true);
 };
 
 // ===================
 // Rule 
 // ===================
 
-function Rule(msg) {
-    function rule(obj) {
-        var checks = rule.checks,
-            v = check(obj, rule.msg);
-
-        for (var i = 0, len = checks.length; i < len; ++i) {
-            v[checks[i][0]].apply(v, checks[i][1]);
-        }
-    }
-
-    rule.__proto__ = Rule.prototype;
-
-    rule.msg = msg;
-    rule.checks = [];
-
-    return rule;
+function Rule(msg, optional, onerror) {
+    this.__msg = msg;
+    this.optional = optional;
+    this.onerror = onerror;
+    this.checks = [];
 }
+
+
+
+Rule.prototype.isOptional = function() {
+    this.optional = true;
+    return this;
+};
+
+Rule.prototype.msg = function(msg) {
+    this.__msg = msg;
+    return this;
+};
+
+Rule.prototype.error = function(onerror) {
+    this.onerror = onerror;
+    return this;
+};
+
+
+Rule.prototype.__exec__ = function(obj) {
+    if(this.optional && typeof obj === 'undefined')
+        return;
+
+    var checks = this.checks,
+        v = check(obj, this.__msg);
+
+    if(this.onerror) v.error = this.onerror;
+
+    for (var i = 0, len = checks.length; i < len; ++i) {
+        v[checks[i][0]].apply(v, checks[i][1]);
+    }
+};
+
 
 
 for (var key in validators) {
@@ -81,13 +146,16 @@ for (var key in validators) {
 
                     host.checks.push([key, arguments]);
                     return host;
-            };
+                };
         })(key);
     }
 }
 
 
+
 module.exports.Checker = Checker;
+
+// exports node-validator api
 module.exports.check = check;
 module.exports.sanitize = validator.sanitize;
 
@@ -97,12 +165,14 @@ module.exports.sanitize = validator.sanitize;
 
 function applyRule(rule, val) {
     if (rule instanceof Rule) {
+        rule.__exec__(val);
+    }else if (rule instanceof Function) {
         rule(val);
     } else if (isPlainObject(rule)) {
         for (var field in rule) {
             if (rule.hasOwnProperty(field)) {
                 if (val === undefined || val === null)
-                    throw new Error('Candidate is undfined or null');
+                    throw new Error('Candidate is undefined or null');
                 applyRule(rule[field], val[field]);
             }
         }
@@ -128,7 +198,7 @@ function validateRule(rules) {
     for (var key in rules) {
         if (rules.hasOwnProperty(key)) {
             var rule = rules[key];
-            if (!rule instanceof Rule) {
+            if (!(rule instanceof Rule || rule instanceof Function)) {
                 if (!isPlainObject(rule)) {
                     throw new Error('rules are not appoporiate.');
                 }
