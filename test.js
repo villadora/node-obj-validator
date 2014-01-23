@@ -64,6 +64,20 @@ describe('obj-validator', function() {
         user();
     });
 
+    it('optional(ignoreEmptyValue)', function() {
+        var user = Checker({
+            id: Checker.isOptional(true).isInt()
+        });
+        
+        user({id: ""});
+
+        var user = Checker({
+            homepage: Checker.isOptional(true).isUrl()
+        });
+        
+        user({homepage: ""});
+        user({homepage: undefined});
+    });
 
     it('simple check', function() {
         var user = Checker({

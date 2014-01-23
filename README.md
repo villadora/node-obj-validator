@@ -76,11 +76,12 @@ The validation methods is the same as [node-validator](https://github.com/chriso
 
 ### Additional methods
 
-* ```isOptional()```: which mark this property checking is optional and no needed if the property is not existing in candidate
+* ```isOptional(ignoreFalseValue)```: which mark this property checking is optional and no needed if the property is not existing in candidate
 * ``` error(fn)```: add error handler
 
 ## Changelog
 
+* 0.0.6: 'isOptional' method now accepts argument `ignoreFalseValue`, which indicates whether the checker accept false values like 0, "", null, etc.
 * 0.0.5: add 'isOptional' and make nested object checker better; allow custom error handlers
 * 0.0.4: expose check api in 'validator' for convinient
 * 0.0.3: make internal Rule callable

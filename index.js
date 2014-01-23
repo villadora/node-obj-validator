@@ -1,7 +1,7 @@
 var validator = require('validator'),
-check = validator.check,
-validators = validator.validators,
-Validator = validator.Validator;
+    check = validator.check,
+    validators = validator.validators,
+    Validator = validator.Validator;
 
 // ===================
 // Validator Extend
@@ -35,6 +35,9 @@ var Checker = function(rules) {
     function checker(obj) {
         if(checker.optional && typeof obj === 'undefined')
             return;
+        
+        if(checker.ignoreFalseValue && !obj)
+            return;
 
         /* jshint eqnull: true */
         if(obj == null) {
@@ -66,8 +69,9 @@ var Checker = function(rules) {
         return this;
     };
 
-    checker.isOptional = function() {
+    checker.isOptional = function(ignoreFalseValue) {
         this.optional = true;
+        this.ignoreFalseValue = !!ignoreFalseValue;
         return this;
     };
 
@@ -75,7 +79,6 @@ var Checker = function(rules) {
         this.onerror = onerror;
         return this;
     };
-
     return checker;
 };
 
@@ -84,8 +87,10 @@ Checker.msg = function(msg) {
     return new Rule(msg);
 };
 
-Checker.isOptional = function() {
-    return new Rule(undefined, true);
+Checker.isOptional = function(ignoreFalseValue) {
+    var rule = new Rule();
+    rule.isOptional(ignoreFalseValue);
+    return rule;
 };
 
 // ===================
@@ -101,8 +106,9 @@ function Rule(msg, optional, onerror) {
 
 
 
-Rule.prototype.isOptional = function() {
+Rule.prototype.isOptional = function(ignoreFalseValue) {
     this.optional = true;
+    this.ignoreFalseValue = !!ignoreFalseValue;
     return this;
 };
 
@@ -119,6 +125,9 @@ Rule.prototype.error = function(onerror) {
 
 Rule.prototype.__exec__ = function(obj) {
     if(this.optional && typeof obj === 'undefined')
+        return;
+
+    if(this.ignoreFalseValue && !obj)
         return;
 
     var checks = this.checks,
@@ -139,7 +148,7 @@ for (var key in validators) {
             Rule.prototype[key] =
                 Checker[key] =
                 function() {
-                    var host = this;
+                        var host = this;
                     if (this === Checker) {
                         host = new Rule();
                     }
@@ -192,7 +201,6 @@ function isPlainObject(obj) {
     }
     return true;
 }
-
 
 function validateRule(rules) {
     for (var key in rules) {
